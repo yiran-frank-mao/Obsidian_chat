@@ -63,6 +63,25 @@ class ChatEngine:
             except Exception as e:
                 return f"Error calling OpenAI: {e}"
 
+        elif provider == "Azure OpenAI":
+            try:
+                from openai import AzureOpenAI
+                client = AzureOpenAI(
+                    api_key=api_key,
+                    api_version=kwargs.get("api_version", "2023-05-15"),
+                    azure_endpoint=kwargs.get("azure_endpoint")
+                )
+                response = client.chat.completions.create(
+                    model=kwargs.get("model"), # In Azure this is the deployment name
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ]
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                return f"Error calling Azure OpenAI: {e}"
+
         elif provider == "Anthropic":
             try:
                 import anthropic
@@ -96,8 +115,24 @@ class ChatEngine:
                  return response.data[0].embedding
              except Exception as e:
                  logger.error(f"OpenAI embedding error: {e}")
-                 # Return empty or raise
                  raise e
+
+        elif provider == "Azure OpenAI":
+            try:
+                from openai import AzureOpenAI
+                client = AzureOpenAI(
+                    api_key=api_key,
+                    api_version=kwargs.get("api_version", "2023-05-15"),
+                    azure_endpoint=kwargs.get("azure_endpoint")
+                )
+                response = client.embeddings.create(
+                    input=text,
+                    model=kwargs.get("embedding_model") # In Azure this is the deployment name
+                )
+                return response.data[0].embedding
+            except Exception as e:
+                logger.error(f"Azure OpenAI embedding error: {e}")
+                raise e
 
         elif provider == "Mock":
             # Return a random vector of appropriate size for testing
