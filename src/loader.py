@@ -69,12 +69,21 @@ class EmbeddingLoader:
         content = item.get("content") or item.get("text")
         embedding = item.get("embedding") or item.get("vector")
 
-        # Sometimes embedding might be in a nested 'metadata' or similar, but let's stick to top level for now
+        # Ensure embedding is a list of floats
+        if isinstance(embedding, str):
+            try:
+                embedding = json.loads(embedding)
+            except:
+                pass
 
-        if content and embedding:
-            self.chunks.append(Chunk(
-                content=content,
-                embedding=embedding,
-                source=source,
-                metadata=item
-            ))
+        if content and isinstance(embedding, list) and len(embedding) > 0:
+            # Check if elements are numbers
+            if all(isinstance(x, (int, float)) for x in embedding):
+                self.chunks.append(Chunk(
+                    content=content,
+                    embedding=embedding,
+                    source=source,
+                    metadata=item
+                ))
+            else:
+                 logger.debug(f"Skipping chunk with non-numeric embedding in {source}")

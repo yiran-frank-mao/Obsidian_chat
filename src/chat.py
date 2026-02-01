@@ -19,13 +19,33 @@ class ChatEngine:
                 logger.warning(f"Filtered out {len(chunks) - len(valid_chunks)} chunks with inconsistent embedding dimensions.")
 
             self.chunks = valid_chunks
-            self.embeddings = np.array([c.embedding for c in self.chunks])
+
+            # Create embeddings matrix
+            try:
+                self.embeddings = np.array([c.embedding for c in self.chunks])
+
+                # Verify shape is 2D
+                if len(self.embeddings.shape) != 2:
+                    logger.error(f"Embeddings matrix has incorrect shape: {self.embeddings.shape}. Expected 2D array.")
+                    # Try to force 2D if it's 1D (e.g. array of objects)
+                    # But if we filtered correctly, it should be fine.
+                    # If it fails here, we should probably disable search.
+                    self.embeddings = None
+            except Exception as e:
+                logger.error(f"Failed to create embeddings matrix: {e}")
+                self.embeddings = None
         else:
             self.embeddings = None
 
     def search(self, query_embedding: List[float], k: int = 3) -> List[Chunk]:
         if self.embeddings is None or len(self.embeddings) == 0:
+            logger.warning("Search called but embeddings are empty or invalid.")
             return []
+
+        # Double check shape before accessing index 1
+        if len(self.embeddings.shape) < 2:
+             logger.error(f"Embeddings shape {self.embeddings.shape} is not 2D. Cannot perform search.")
+             return []
 
         # Ensure query embedding matches dimension
         if len(query_embedding) != self.embeddings.shape[1]:
@@ -138,7 +158,7 @@ class ChatEngine:
             # Return a random vector of appropriate size for testing
             # We need to know the target dimension.
             # If we have loaded chunks, we can use their dimension.
-            if self.embeddings is not None and len(self.embeddings) > 0:
+            if self.embeddings is not None and len(self.embeddings.shape) > 1 and self.embeddings.shape[1] > 0:
                 dim = self.embeddings.shape[1]
                 return list(np.random.rand(dim))
             return [0.1, 0.2, 0.3]
