@@ -60,7 +60,7 @@ class EmbeddingLoader:
                 logger.warning(f"Could not find vectors in Orama file {filename}")
                 return
 
-            for doc_id, doc_data in docs_map.items():
+            for doc_key, doc_data in docs_map.items():
                 if not isinstance(doc_data, dict):
                     continue
 
@@ -69,8 +69,17 @@ class EmbeddingLoader:
                 # Source path
                 source = doc_data.get("filepath") or doc_data.get("path") or filename
 
-                # Get embedding using doc_id
-                embedding = vectors_map.get(doc_id)
+                # IMPORTANT: Use the internal document ID to look up the embedding,
+                # not the key in the docs map (which might be a sequential index).
+                doc_id = doc_data.get("id")
+
+                embedding = None
+                if doc_id:
+                     embedding = vectors_map.get(doc_id)
+
+                # Fallback: if vectors keyed by doc_key (less likely but robust)
+                if not embedding:
+                     embedding = vectors_map.get(doc_key)
 
                 if content and embedding:
                     self._add_validated_chunk(content, embedding, source, doc_data)
