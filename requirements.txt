@@ -1,0 +1,8 @@
+streamlit
+openai
+anthropic
+numpy
+pandas
+python-dotenv
+tiktoken
+scikit-learn
