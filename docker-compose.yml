@@ -5,7 +5,7 @@ services:
     ports:
       - "8501:8501"
     volumes:
-      - /Users/maoyiran/science_done_right_2:/data
+      - /data:/data
     environment:
       - REPO_PATH=/data
       #
