@@ -5,22 +5,27 @@ services:
     ports:
       - "8501:8501"
     volumes:
-      - ./mock_repo:/data
+      - /Users/maoyiran/science_done_right_2:/data
     environment:
       - REPO_PATH=/data
+      #
+      # Git Repository Update (optional - enables "Update Sources")
+      - GIT_REPO_URL=
+      - GIT_ACCESS_TOKEN=  # Personal Access Token for private repos
+      #
       # AI Model Configuration (optional - if set, the model setup sidebar will be hidden)
       # Chat Model Settings
-      # - CHAT_PROVIDER=OpenAI              # Options: OpenAI, Azure OpenAI, Anthropic, Mock
-      # - CHAT_API_KEY=your-api-key
-      # - CHAT_MODEL=gpt-3.5-turbo          # Model name or Azure deployment name
+      - CHAT_PROVIDER=              # Options: OpenAI, Azure OpenAI, Anthropic, Mock
+      - CHAT_API_KEY=
+      - CHAT_MODEL=          # Model name or Azure deployment name
       # Azure-specific Chat Settings (only needed for Azure OpenAI)
-      # - CHAT_AZURE_ENDPOINT=https://your-resource.openai.azure.com/
-      # - CHAT_API_VERSION=2023-05-15
+      - CHAT_AZURE_ENDPOINT=https://something.azure.com/
+      - CHAT_API_VERSION=2025-01-01-preview
       #
       # Embedding Model Settings
-      # - EMBEDDING_PROVIDER=OpenAI         # Options: OpenAI, Azure OpenAI, Mock
-      # - EMBEDDING_API_KEY=                # Leave empty to use CHAT_API_KEY
-      # - EMBEDDING_MODEL=text-embedding-ada-002
+      - EMBEDDING_PROVIDER=         # Options: OpenAI, Azure OpenAI, Mock
+      - EMBEDDING_API_KEY=               # Leave empty to use CHAT_API_KEY
+      - EMBEDDING_MODEL=
       # Azure-specific Embedding Settings (only needed for Azure OpenAI)
-      # - EMBEDDING_AZURE_ENDPOINT=https://your-resource.openai.azure.com/
-      # - EMBEDDING_API_VERSION=2023-05-15
+      - EMBEDDING_AZURE_ENDPOINT=https://something.azure.com/
+      - EMBEDDING_API_VERSION=2023-05-15
